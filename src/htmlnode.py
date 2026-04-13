@@ -34,8 +34,7 @@ class LeafNode(HTMLNode):
             raise ValueError()
         if self.tag is None or self.tag == "":
             return self.value
-        props = " " + self.props_to_html() if self.props is not None or self.props is not None and len(
-            self.props) > 0 else ""
+        props = " " + self.props_to_html() if self.props else ""
         return f"<{self.tag}{props}>{self.value}</{self.tag}>"
 
     def __eq__(self, other):
