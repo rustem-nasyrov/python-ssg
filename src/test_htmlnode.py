@@ -1,5 +1,5 @@
 import unittest
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -42,3 +42,24 @@ class TestLeafNode(unittest.TestCase):
         value = "Text"
         leaf_html = LeafNode(tag=None, value=value).to_html()
         self.assertEqual(leaf_html, value)
+
+
+class TestParentNode(unittest.TestCase):
+    def test_to_html_with_children(self):
+        child_node = LeafNode("span", "child")
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
+
+    def test_to_html_with_grandchildren(self):
+        grandchild_node = LeafNode("b", "grandchild")
+        child_node = ParentNode("span", [grandchild_node])
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(
+            parent_node.to_html(),
+            "<div><span><b>grandchild</b></span></div>",
+        )
+
+    def test_to_html_with_props(self):
+        child_node = LeafNode("span", "text", {"class": "content"})
+        parent_node = ParentNode("div", [child_node], props={"class": "foo"})
+        self.assertEqual(parent_node.to_html(), "<div class=\"foo\"><span class=\"content\">text</span></div>")
