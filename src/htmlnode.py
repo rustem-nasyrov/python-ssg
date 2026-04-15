@@ -1,3 +1,6 @@
+self_closing_tags = ["img"]
+
+
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
@@ -8,21 +11,35 @@ class HTMLNode:
     def to_html(self):
         raise NotImplementedError(self)
 
+    def is_self_closing(self):
+        return self.tag.lower() in self_closing_tags
+
+    def get_props(self):
+        props = self.props
+
+        if self.is_self_closing() and "alt" not in props:
+            props["alt"] = self.value
+
+        return props
+
     def props_to_html(self):
-        if self.props is None:
+        props = self.get_props()
+
+        if props is None:
             return ""
+
         props_list = []
 
-        for key in self.props:
-            props_list.append(f'{key}="{self.props[key]}"')
+        for key in props:
+            props_list.append(f'{key}="{props[key]}"')
 
         return " ".join(props_list).strip()
 
-    def __eq__(self, other):
-        return self.tag == other.tag and self.value == other.value and self.children == other.children and self.props == other.props
+    def __eq__(self, other: HTMLNode):
+        return self.tag == other.tag and self.value == other.value and self.children == other.children and self.get_props() == other.get_props()
 
     def __repr__(self):
-        return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
+        return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.get_props()})"
 
 
 class LeafNode(HTMLNode):
@@ -32,16 +49,22 @@ class LeafNode(HTMLNode):
     def to_html(self):
         if self.value is None or self.value == "":
             raise ValueError()
+
         if self.tag is None or self.tag == "":
             return self.value
-        props = " " + self.props_to_html() if self.props else ""
+
+        props = " " + self.props_to_html() if self.get_props() else ""
+
+        if self.is_self_closing():
+            return f"<{self.tag}{props} />"
+
         return f"<{self.tag}{props}>{self.value}</{self.tag}>"
 
-    def __eq__(self, other):
-        return self.tag == other.tag and self.value == other.value and self.props == other.props
+    def __eq__(self, other: LeafNode):
+        return self.tag == other.tag and self.value == other.value and self.get_props() == other.get_props()
 
     def __repr__(self):
-        return f"LeafNode({self.tag}, {self.value}, {self.props})"
+        return f"LeafNode({self.tag}, {self.value}, {self.get_props()})"
 
 
 class ParentNode(HTMLNode):
@@ -56,5 +79,5 @@ class ParentNode(HTMLNode):
         children_list = []
         for child in self.children:
             children_list.append(child.to_html())
-        props = " " + self.props_to_html() if self.props else ""
+        props = " " + self.props_to_html() if self.get_props() else ""
         return f"<{self.tag}{props}>{''.join(children_list)}</{self.tag}>"

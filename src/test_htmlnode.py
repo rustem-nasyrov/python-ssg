@@ -43,6 +43,15 @@ class TestLeafNode(unittest.TestCase):
         leaf_html = LeafNode(tag=None, value=value).to_html()
         self.assertEqual(leaf_html, value)
 
+    def test_to_img(self):
+        html = "<img src=\"https://example.com/image.jpeg\" alt=\"Example image\" />"
+        leaf = LeafNode(
+            tag="img",
+            value="Example image",
+            props={"src": "https://example.com/image.jpeg"}
+        )
+        self.assertEqual(leaf.to_html(), html)
+
 
 class TestParentNode(unittest.TestCase):
     def test_to_html_with_children(self):
