@@ -33,6 +33,17 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         ]
         self.assertEqual(outcome, target)
 
+    def test_split_two(self):
+        node = TextNode("This is _text_ with a italic phrase _in the end_", TextType.TEXT)
+        outcome = split_nodes_delimiter([node], "_", TextType.ITALIC)
+        target = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.ITALIC),
+            TextNode(" with a italic phrase ", TextType.TEXT),
+            TextNode("in the end", TextType.ITALIC),
+        ]
+        self.assertEqual(outcome, target)
+
 
 class TestExtract(unittest.TestCase):
     def test_extract_markdown_images(self):
