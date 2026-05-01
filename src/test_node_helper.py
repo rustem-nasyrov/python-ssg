@@ -1,5 +1,6 @@
 import unittest
-from node_helper import split_nodes_delimiter, extract_markdown_images, split_nodes_image, split_nodes_link
+from node_helper import split_nodes_delimiter, extract_markdown_images, split_nodes_image, split_nodes_link, \
+    text_to_textnodes
 from src.node_helper import extract_markdown_links
 from textnode import TextType, TextNode
 
@@ -120,3 +121,65 @@ class TestExtract(unittest.TestCase):
             "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)")
         self.assertEqual(
             [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")], matches)
+
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_plain_text(self):
+        new_nodes = text_to_textnodes("Just plain text")
+        self.assertEqual(
+            [TextNode("Just plain text", TextType.TEXT)],
+            new_nodes,
+        )
+
+    def test_bold_only(self):
+        new_nodes = text_to_textnodes("This is **bold** text")
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(" text", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+
+    def test_italic_only(self):
+        new_nodes = text_to_textnodes("This is _italic_ text")
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" text", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+
+    def test_code_only(self):
+        new_nodes = text_to_textnodes("This is `code` text")
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(" text", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+
+    def test_image_only(self):
+        new_nodes = text_to_textnodes("Image: ![alt](https://example.com/img.png)")
+        self.assertEqual(
+            [
+                TextNode("Image: ", TextType.TEXT),
+                TextNode("alt", TextType.IMAGE, "https://example.com/img.png"),
+            ],
+            new_nodes,
+        )
+
+    def test_link_only(self):
+        new_nodes = text_to_textnodes("Link: [example](https://example.com)")
+        self.assertEqual(
+            [
+                TextNode("Link: ", TextType.TEXT),
+                TextNode("example", TextType.LINK, "https://example.com"),
+            ],
+            new_nodes,
+        )
