@@ -1,5 +1,4 @@
 import unittest
-
 from src.blocktype import block_to_block_type, BlockType
 
 

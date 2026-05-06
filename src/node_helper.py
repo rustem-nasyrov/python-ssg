@@ -1,7 +1,7 @@
 import re
 
-from textnode import TextNode, TextType
-from htmlnode import LeafNode
+from src.textnode import TextNode, TextType
+from src.htmlnode import LeafNode
 
 
 def text_node_to_html_node(text_node: TextNode):
