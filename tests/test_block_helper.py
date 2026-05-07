@@ -1,5 +1,5 @@
 import unittest
-from src.block_helper import markdown_to_blocks, markdown_to_html_node
+from src.block_helper import (markdown_to_blocks, markdown_to_html_node, extract_title)
 
 
 class TestMarkdownToBlocks(unittest.TestCase):
@@ -109,6 +109,7 @@ Next block
             ],
         )
 
+
 class TestMarkdownToHtmlNode(unittest.TestCase):
     def test_paragraphs(self):
         md = """
@@ -141,3 +142,22 @@ the **same** even with inline stuff
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
+
+
+class TestExtractTitle(unittest.TestCase):
+    def test_extract_title(self):
+        md = "# Hello, World!"
+        self.assertEqual("Hello, World!", extract_title(md))
+
+    def test_title_in_the_middle(self):
+        md = """
+Lorem ipsum
+# Hello, World!
+Foo
+Bar
+"""
+        self.assertEqual("Hello, World!", extract_title(md))
+
+    def test_no_title(self):
+        with self.assertRaises(Exception):
+            extract_title("")

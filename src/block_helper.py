@@ -98,3 +98,10 @@ def markdown_to_html_node(markdown):
             children.append(_paragraph_block(block))
 
     return ParentNode("div", children)
+
+
+def extract_title(markdown):
+    title_match = re.search(r"^\s*#\s+(.+)$", markdown, re.MULTILINE)
+    if title_match:
+        return title_match.group(1)
+    raise Exception("Title not found")
