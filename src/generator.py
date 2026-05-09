@@ -3,7 +3,7 @@ import os
 from src.block_helper import markdown_to_html_node, extract_title
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(basepath, from_path, template_path, dest_path):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     markdown = None
     with open(os.path.normpath(from_path)) as opened_file:
@@ -15,6 +15,8 @@ def generate_page(from_path, template_path, dest_path):
     title = extract_title(markdown)
     template = template.replace("{{ Title }}", title)
     content = template.replace("{{ Content }}", markdown_html)
+    content = content.replace("href=\"/", f"href=\"{basepath}")
+    content = content.replace("src=\"/", f"src=\"{basepath}")
     parent_dir = os.path.dirname(dest_path)
     if parent_dir != "":
         os.makedirs(parent_dir, 0o755, exist_ok=True)
@@ -33,8 +35,8 @@ def collect_paths(root_path, known_paths):
     return known_paths
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(basepath, dir_path_content, template_path, dest_dir_path):
     file_paths = collect_paths(dir_path_content, [])
     for file in file_paths:
         file_dest_path = file.replace(dir_path_content, dest_dir_path).replace("md", "html")
-        generate_page(file, template_path, file_dest_path)
+        generate_page(basepath, file, template_path, file_dest_path)
