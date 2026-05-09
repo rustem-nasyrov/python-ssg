@@ -101,7 +101,7 @@ def markdown_to_html_node(markdown):
 
 
 def extract_title(markdown):
-    title_match = re.search(r"^\s*#\s+(.+)$", markdown, re.MULTILINE)
+    title_match = re.search(r"^#(?!#)\s+(.+)$", markdown, re.MULTILINE)
     if title_match:
-        return title_match.group(1)
+        return title_match.group(1).strip()
     raise Exception("Title not found")
